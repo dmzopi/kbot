@@ -1,46 +1,53 @@
-1. Module initialization (name is arbitrary)
-go mod init github.com/dmzopi/kbot
+# kbot
 
-2. Install and import CLI code generator Cobra: https://github.com/spf13/cobra
-go install github.com/spf13/cobra-cli@latest
+A Telegram bot for Golang learning purposes 
 
-3. Generate inital project code (ensure binary is in PATH export PATH=$PATH:$(go env GOPATH)/bin)
-cobra-cli init
+## Features
 
-4. Generate code for command "version"
-cobra-cli add version
-Cange code: in version.go, initialize variable "var appVersion" and substitute string in Println statement
+- Basic message handler
 
-5. Test build and run code
-go run main.go help
-go run main.go version
+## Prerequisites
 
-6. Generate main function
-cobra-cli add kbot
+- Go 1.26.1 or later
+- Telegram Bot Token (set as TELE_TOKEN environment variable)
+- Required Go packages:
+  - github.com/spf13/cobra
+  - gopkg.in/telebot.v4
 
-7. Generate exe file
-Using -ldflags "-X=" : function to change values of imported pakages during build just from cli 
-go build -ldflags "-X="github.com/dmzopi/kbot/cmd.appVersion=v.1.0.0
+## Installation
 
-8. Test
-./kbot version
+1. Clone the repository:
+```bash
+git clone https://github.com/dmzopi/kbot.git
+cd kbot
+```
 
-9. Telebot is a bot framework for Telegram Bot API (https://github.com/tucnak/telebot, https://pkg.go.dev/gopkg.in/telebot.v3)
-Code:
-# Get Token from Env
-# Initialize bot with Token and Poller settings
-# Handle fatal error (no/wrong Token)
-# Write Ontext message handler
-# Start handler
-# Create alias "start"
-Aliases: []string{"start"},
-# Format code
-gofmt -s -w ./
-# Download and install required pakages
-go get
-# Build and check new version
-go build -ldflags "-X="github.com/dmzopi/kbot/cmd.appVersion=v.1.0.1
-# !!! Securely assign env variable, so no termina log is writen
+2. Set up your Telegram Bot Token:
+```bash
 read -s TELE_TOKEN
-# Export env
-export TELE_TOKEN
+export TELE_TOKEN="your_telegram_bot_token"
+```
+
+## Usage
+
+Start the bot:
+```bash
+./kbot start
+```
+### Bot URL
+[t.me/dmzopi_bot](https://t.me/dmzopi_bot)
+
+### Available Commands
+
+- `/help` - Show available commands
+
+## Development
+
+The project uses Cobra for CLI command management
+
+### Project Structure
+
+- `cmd/` - Contains the main command implementations
+  - `kbot.go` - Main bot implementation and traffic light control
+  - `root.go` - Root command configuration
+  - `version.go` - Version command implementation

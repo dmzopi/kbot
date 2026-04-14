@@ -1,0 +1,48 @@
+Telegram Biot 
+
+
+1. Module initialization (name is arbitrary)
+go mod init github.com/dmzopi/kbot
+
+2. Install and import CLI code generator Cobra: https://github.com/spf13/cobra
+go install github.com/spf13/cobra-cli@latest
+
+3. Generate inital project code (ensure binary is in PATH export PATH=$PATH:$(go env GOPATH)/bin)
+cobra-cli init
+
+4. Generate code for command "version"
+cobra-cli add version
+Cange code: in version.go, initialize variable "var appVersion" and substitute string in Println statement
+
+5. Test build and run code
+go run main.go help
+go run main.go version
+
+6. Generate main function
+cobra-cli add kbot
+
+7. Generate exe file
+Using -ldflags "-X=" : function to change values of imported pakages during build just from cli 
+go build -ldflags "-X="github.com/dmzopi/kbot/cmd.appVersion=v.1.0.0
+
+8. Test
+./kbot version
+
+9. Telebot is a bot framework for Telegram Bot API (https://github.com/tucnak/telebot, https://pkg.go.dev/gopkg.in/telebot.v3)
+Code roadmap:
+* Initialize Bot with Token fetched from Env and Poller settings
+* Handle fatal error (no/wrong Token)
+* Write Ontext message handler
+* Start handler
+* Create alias "start"
+Aliases: []string{"start"},
+* Format code
+gofmt -s -w ./
+* Download and install required pakages
+go get
+* Build and check new version
+go build -ldflags "-X="github.com/dmzopi/kbot/cmd.appVersion=v.1.0.1
+* !!! Securely assign env variable, so no traces in terminal log 
+read -s TELE_TOKEN
+* Export env
+export TELE_TOKEN

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	telebot "gopkg.in/telebot.v3"
+	telebot "gopkg.in/telebot.v4"
 )
 
 // Declare Telegram bot API Token
@@ -30,37 +30,51 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("kbot %s started", appVersion)
+		fmt.Printf("kbot %s started\n", appVersion)
+
 		// Initialize bot
 		kbot, err := telebot.NewBot(telebot.Settings{
-			URL:    "",
 			Token:  TeleToken,
 			Poller: &telebot.LongPoller{Timeout: 10 * time.Second},
 		})
-		// In case of Fatal error -> exit
 		if err != nil {
 			log.Fatalf("Please check TELE_TOKEN env variable. %s", err)
-			return
 		}
 
-		// Messages handler
-		kbot.Handle(telebot.OnText, func(m telebot.Context) error {
+		// Command Handlers
+		kbot.Handle("/hello", withLogging(func(c telebot.Context) error {
+			return c.Send("Hello There! I'm Kbot, I'm written in Go")
+		}))
 
-			log.Print(m.Message().Payload, m.Text())
+		kbot.Handle("/version", withLogging(func(c telebot.Context) error {
+			return c.Send(fmt.Sprintf("Version: %s", appVersion))
+		}))
 
-			payload := m.Message().Payload
-			// start/ hello => return version
-			switch payload {
-			case "hello":
-				err = m.Send(fmt.Sprintf("Hello I'm kbot %s!", appVersion))
+		kbot.Handle("/help", withLogging(func(c telebot.Context) error {
+			return c.Send("Available commands:\n/help\n/hello\n/version")
+		}))
+
+		// Log everything beyond recognized commands
+		kbot.Handle(telebot.OnText, func(c telebot.Context) error {
+			if c.Message() != nil {
+				log.Printf("Message received: %s", c.Message().Text)
 			}
-
 			return err
 		})
 
-		// Handler start
+		// Start bot
 		kbot.Start()
 	},
+}
+
+// Command Log Wrapper
+func withLogging(next telebot.HandlerFunc) telebot.HandlerFunc {
+	return func(c telebot.Context) error {
+		if c.Message() != nil {
+			log.Printf("Command received: %s", c.Message().Text)
+		}
+		return next(c)
+	}
 }
 
 func init() {

@@ -5,6 +5,7 @@ go 1.26.1
 require (
 	github.com/spf13/cobra v1.10.2
 	gopkg.in/telebot.v3 v3.3.8
+	gopkg.in/telebot.v4 v4.0.0-beta.7
 )
 
 require (
