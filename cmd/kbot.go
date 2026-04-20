@@ -50,8 +50,12 @@ to quickly create a Cobra application.`,
 			return c.Send(fmt.Sprintf("Version: %s", appVersion))
 		}))
 
+		kbot.Handle("/date", withLogging(func(c telebot.Context) error {
+			return c.Send(time.Now().Format("2006-01-02 15:04:05"))
+		}))
+
 		kbot.Handle("/help", withLogging(func(c telebot.Context) error {
-			return c.Send("Available commands:\n/help\n/hello\n/version")
+			return c.Send("Available commands:\n/help\n/hello\n/version\n/date")
 		}))
 
 		// Log everything beyond recognized commands

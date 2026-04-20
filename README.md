@@ -25,7 +25,7 @@ cd kbot
 2. Set up your Telegram Bot Token:
 ```bash
 read -s TELE_TOKEN
-export TELE_TOKEN="your_telegram_bot_token"
+export TELE_TOKEN
 ```
 
 ## Usage
