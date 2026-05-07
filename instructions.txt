@@ -1,4 +1,4 @@
-Telegram Biot 
+Telegram Bot 
 
 1. Module initialization (name is arbitrary)
 go mod init github.com/dmzopi/kbot
@@ -45,3 +45,21 @@ go build -ldflags "-X="github.com/dmzopi/kbot/cmd.appVersion=v1.0.1
 read -s TELE_TOKEN
 * Export env
 export TELE_TOKEN
+
+10. Build container
+* Set plaftform/arch in Makefile
+* build binary
+make build
+* Build container
+make build 
+* Push container to repo
+make push
+
+11. Helm
+* Create repo
+helm create ./helm
+* Remove extra templates
+* Validate YAML
+helm lint ./helm/
+* Build chart manifest
+helm template kbot ./helm/
