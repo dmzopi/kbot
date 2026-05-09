@@ -39,7 +39,7 @@ jobs:
           REPO: dmzopi
         run: |
           make image push
-          echo "IMAGE_REPO=${REGISTRY}/${REPO}" >> $GITHUB_OUT
+          echo "image_repo=${REGISTRY}/${REPO}" >> $GITHUB_OUTPUT
 
   cd:
     name: CD
