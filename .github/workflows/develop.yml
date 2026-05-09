@@ -15,6 +15,8 @@ jobs:
     permissions:
       #contents: read
       packages: write  # Crucial for ghcr.io push
+    outputs:
+      image_repo: ${{ steps.image.outputs.image_repo }}
 
     steps:
       # Fetch the repo code to runner
