@@ -57,7 +57,7 @@ jobs:
       uses: mikefarah/yq@master
       with:
         cmd: > 
-          yq -i '.image.repository=strenv(IMAGE_REPO)' helm/values.yaml
+          yq -i '.image.repository=strenv(IMAGE_REPO)' helm/values.yaml &&
           yq -i '.image.tag=strenv(VERSION)' helm/values.yaml
 
     - name: Commit Helm chart changes
