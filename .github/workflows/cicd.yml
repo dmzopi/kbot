@@ -7,13 +7,16 @@ jobs:
   ci:
     name: CI
     # Runner with run on githib vm, ubuntu 
-    runs-on: ubunu-latest
+     runs-on: ubuntu-latest
+    # Run on self-hosted runner
+    #runs-on: self-hosted
 
     steps:
       # Fetch the repo code to runner
       - name: Checkout
         uses: actions/checkout@v3
-      
+        with:
+          fetch-depth: 0 # we need all history for bracnhes and tags, beacuse we use it for versioning in Makefile
       - name: Run test
         run: make test
       
@@ -22,3 +25,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+      - name: Build&Push
+        env:
+          APP: "kbot"
+          REGISTRY: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: make image push
