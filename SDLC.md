@@ -100,9 +100,11 @@ helm package ./helm
 ### 🚀 Release (GitHub)
 
 ```bash
+git tag v1.0.3
+git push origin v1.0.3
 gh release create
 gh release list
-gh release upload kbot kbot-0.0.1.tgz
+gh release upload v1.0.3 kbot-0.0.1.tgz
 ```
 
 ---
