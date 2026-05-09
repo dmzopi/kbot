@@ -37,8 +37,9 @@ jobs:
           APP: "kbot"
           REGISTRY: ghcr.io
           REPO: dmzopi
-          IMAGE_REPO: ${{ env.REGISTRY }}/${{ env.REPO }}
-        run: make image push
+        run: |
+          make image push
+          echo "IMAGE_REPO=${REGISTRY}/${REPO}" >> $GITHUB_ENV
 
   cd:
     name: CD
