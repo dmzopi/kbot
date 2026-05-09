@@ -8,8 +8,8 @@ replicaCount: 1
 image:
   pullPolicy: Always
   registry: "ghcr.io"
-  repository: "dmzopi/kbot"
-  tag: "v1.0.3-528d5a6"
+  repository: "ghcr.io/dmzopi"
+  tag: "v1.0.3-51bc051"
   arch: "amd64"
   os: linux
 secret:
