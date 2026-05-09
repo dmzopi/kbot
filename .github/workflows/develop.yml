@@ -39,12 +39,12 @@ jobs:
           REPO: dmzopi
         run: |
           make image push
-          IMAGE_REPO="${REGISTRY}/${REPO}/${APP}"
+          IMAGE_REPO="${REGISTRY}/${REPO}"
           echo "image_repo=$IMAGE_REPO" >> $GITHUB_OUTPUT
 
   cd:
     name: CD
-    needs: ci #starts only is ci job finished well
+    needs: ci #starts only is ci job finished well 
     runs-on: ubuntu-latest
 
     steps:
