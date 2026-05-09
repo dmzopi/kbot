@@ -24,6 +24,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0 # we need all history for bracnhes and tags, beacuse we use it for versioning in Makefile
+
       - name: Run test
         run: make test
       
@@ -35,6 +36,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
     
       - name: Build&Push
+        id: image
         env:
           APP: "kbot"
           REGISTRY: ghcr.io
@@ -42,20 +44,24 @@ jobs:
         run: |
           make image push
           IMAGE_REPO="${REGISTRY}/${REPO}"
-          echo "image_repo=$IMAGE_REPO" >> $GITHUB_OUTPUT
+          echo "image_repo=${IMAGE_REPO}" >> $GITHUB_OUTPUT
 
   cd:
     name: CD
     needs: ci #starts only is ci job finished well 
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
     
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
+
     # Pass VERSION to HITHUBENV, so shared with other steps
     - run: echo "VERSION=$(git describe --tags --abbrev=0)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
     # Set current image TAG in helm chart 
     - name: Update Helm RE
       env:
