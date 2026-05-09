@@ -1,0 +1,24 @@
+name: KBOT-CICD
+
+# Event that triggers job 
+on: push
+
+jobs:
+  ci:
+    name: CI
+    # Runner with run on githib vm, ubuntu 
+    runs-on: ubunu-latest
+
+    steps:
+      # Fetch the repo code to runner
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Run test
+        run: make test
+      
+      - name: Docker hub login
+        uses: docker/login-actions@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
