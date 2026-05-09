@@ -39,7 +39,7 @@ jobs:
           REPO: dmzopi
         run: |
           make image push
-          echo "IMAGE_REPO=${REGISTRY}/${REPO}" >> $GITHUB_ENV
+          echo "IMAGE_REPO=${REGISTRY}/${REPO}" >> $GITHUB_OUT
 
   cd:
     name: CD
@@ -55,9 +55,12 @@ jobs:
     - run: echo "VERSION=$(git describe --tags --abbrev=0)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
     # Set current image TAG in helm chart 
     - name: Update Helm RE
+      env:
+        IMAGE_REPO: ${{ needs.ci.outputs.image_repo }}
       uses: mikefarah/yq@master
       with:
-        cmd: > 
+        cmd: >
+          echo "IMAGE_REPO=${IMAGE_REPO}" &&
           yq -i '.image.repository=strenv(IMAGE_REPO)' helm/values.yaml &&
           yq -i '.image.tag=strenv(VERSION)' helm/values.yaml
 
