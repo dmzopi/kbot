@@ -29,7 +29,7 @@ get:
 	go get
 build: format get
 	CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -v -o kbot -ldflags "-X="github.com/dmzopi/kbot/cmd.appVersion=${VERSION}
-image:
+image: print-env
 	docker build . -t ${TARGETIMAGE}
 clean:
 	rm -rf kbot

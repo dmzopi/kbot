@@ -1,7 +1,9 @@
 name: KBOT-CICD
 
 # Event that triggers job 
-on: push
+on:
+  push:
+    branches: [ main ]
 
 jobs:
   ci:
