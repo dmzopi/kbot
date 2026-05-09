@@ -1,10 +1,23 @@
-# https://github.com/dmzopi/kbot.git -> kbot
 APP=$(shell basename -s .git $(shell git remote get-url origin))
-REGISTRY=opidoc
-# Format as Version: v1.0.3-41a00aa
+REGISTRY ?= docker.io
+REPO ?= opidoc
 VERSION=$(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
-TARGETOS=linux #linux windows darwin
-TARGETARCH=amd64 #amd64 arm64
+#TARGETOS options: inux windows darwin
+TARGETOS=linux
+#TARGETARCH options: amd64 arm64
+TARGETARCH=amd64
+
+# Assign target image
+ifeq ($(filter $(strip $(REGISTRY)), docker.io),docker.io)
+TARGETIMAGE := $(REPO)/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
+else ifeq ($(strip $(REGISTRY)),)
+TARGETIMAGE := $(REPO)/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
+else
+TARGETIMAGE := $(REGISTRY)/$(REPO)/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
+endif
+
+print-env:
+	@echo "TARGETIMAGE: $(TARGETIMAGE)"
 
 format:
 	gofmt -s -w ./
@@ -17,8 +30,8 @@ get:
 build: format get
 	CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -v -o kbot -ldflags "-X="github.com/dmzopi/kbot/cmd.appVersion=${VERSION}
 image:
-	docker build . -t ${REGISTRY}/${APP}:${VERSION}-${TARGETARCH}
+	docker build . -t ${TARGETIMAGE}
 clean:
 	rm -rf kbot
 push: clean
-	docker push ${REGISTRY}/${APP}:${VERSION}-${TARGETARCH}
+	docker push ${TARGETIMAGE}

@@ -1,0 +1,40 @@
+name: KBOT-CICD
+
+# Event that triggers job 
+on: 
+  push:
+    branches: [ develop ]
+
+jobs:
+  ci:
+    name: CI
+    #Runner with run on githib vm, ubuntu 
+    runs-on: ubuntu-latest
+    #Run on self-hosted runner
+    #runs-on: self-hosted
+    permissions:
+      #contents: read
+      packages: write  # Crucial for ghcr.io push
+
+    steps:
+      # Fetch the repo code to runner
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # we need all history for bracnhes and tags, beacuse we use it for versioning in Makefile
+      - name: Run test
+        run: make test
+      
+      - name: Log in to the Container registry ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+    
+      - name: Build&Push
+        env:
+          APP: "kbot"
+          REGISTRY: ghcr.io
+          REPO: dmzopi
+        run: make image push
