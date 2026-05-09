@@ -5,11 +5,11 @@ on: push
 
 jobs:
   ci:
-    name: CI
-    # Runner with run on githib vm, ubuntu 
-     runs-on: ubuntu-latest
-    # Run on self-hosted runner
-    #runs-on: self-hosted
+  name: CI
+  #Runner with run on githib vm, ubuntu 
+  runs-on: ubuntu-latest
+  #Run on self-hosted runner
+  #runs-on: self-hosted
 
     steps:
       # Fetch the repo code to runner
