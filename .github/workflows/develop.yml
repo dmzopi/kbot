@@ -37,4 +37,32 @@ jobs:
           APP: "kbot"
           REGISTRY: ghcr.io
           REPO: dmzopi
+          IMAGE_REPO: ${{ env.REGISTRY }}/${{ env.REPO }}
         run: make image push
+
+  cd:
+    name: CD
+    needs: ci #starts only is ci job finished well
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    # Pass VERSION to HITHUBENV, so shared with other steps
+    - run: echo "VERSION=$(git describe --tags --abbrev=0)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+    # Set current image TAG in helm chart 
+    - name: Update Helm RE
+      uses: mikefarah/yq@master
+      with:
+        cmd: > 
+          yq -i '.image.repository=strenv(IMAGE_REPO)' helm/values.yaml
+          yq -i '.image.tag=strenv(VERSION)' helm/values.yaml
+
+    - name: Commit Helm chart changes
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git commit -am "CD: update version to $VERSION, image $IMAGE_REPO"
+        git push
