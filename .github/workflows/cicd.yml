@@ -1,5 +1,9 @@
 name: KBOT-CICD
 
+# Allow github actions to commit code
+permissions:
+  contents: write
+
 # Event that triggers job 
 on: push
 
