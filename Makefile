@@ -33,8 +33,8 @@ image: print-env
 	docker build . -t ${TARGETIMAGE}
 clean:
 	rm -rf kbot
-	ifeq ($(RMI),true)
-	docker rmi ${TARGETIMAGE}
-	endif
+ifeq ($(RMI),true)
+	-docker rmi ${TARGETIMAGE}
+endif
 push: clean
 	docker push ${TARGETIMAGE}
