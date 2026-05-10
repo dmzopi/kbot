@@ -2,6 +2,7 @@ APP=$(shell basename -s .git $(shell git remote get-url origin))
 REGISTRY ?= docker.io
 REPO ?= opidoc
 VERSION=$(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
+RMI ?= false
 #TARGETOS options: inux windows darwin
 TARGETOS=linux
 #TARGETARCH options: amd64 arm64
@@ -32,5 +33,8 @@ image: print-env
 	docker build . -t ${TARGETIMAGE}
 clean:
 	rm -rf kbot
+	ifeq ($(RMI),true)
+	docker rmi ${TARGETIMAGE}
+	endif
 push: clean
 	docker push ${TARGETIMAGE}

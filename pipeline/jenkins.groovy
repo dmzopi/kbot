@@ -74,7 +74,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', 'docker_hub_repo') {
-                        sh "make push TARGETOS=${params.OS} TARGETARCH=${params.ARCH}"
+                        sh "make push TARGETOS=${params.OS} TARGETARCH=${params.ARCH} RMI=true"
                     }
                 }
             }
