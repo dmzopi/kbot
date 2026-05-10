@@ -40,6 +40,7 @@ pipeline {
         stage('PrintEnv') {
             steps {
                 echo 'Cloned repo: ${REPO}, branch: ${BRANCH}'
+                echo 'Building with parameters: \n OS=$OS \n ARCH=$ARCH \n SKIP_TESTS=$SKIP_TESTS \n SKIP_LINT=$SKIP_LINT'
             }
         }
         stage('Test') {
