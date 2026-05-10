@@ -20,11 +20,6 @@ pipeline {
             defaultValue: false,
             description: 'Skip running tests'
         )
-        booleanParam(
-            name: 'SKIP_LINT',
-            defaultValue: false,
-            description: 'Skip running linter'
-        )
     }
 
     stages {
@@ -41,13 +36,11 @@ pipeline {
             steps {
                 script {
                     echo "Cloned repo: ${env.GIT_URL}, branch: ${env.GIT_BRANCH}"
-
                     echo """
-                        Parameters:
+                        building with parameters:
                         OS          = ${params.OS}
                         ARCH        = ${params.ARCH}
                         SKIP_TESTS  = ${params.SKIP_TESTS}
-                        SKIP_LINT   = ${params.SKIP_LINT}
                         """
                 }
             }
@@ -56,7 +49,7 @@ pipeline {
             steps {
                 script {
                     if (params.SKIP_TESTS) {
-                        echo 'Skipping tests'
+                        echo 'TEST SKIPPED'
                     } else {
                         echo 'TEST EXECUTION STARTED'
                         sh 'make test'
@@ -67,10 +60,9 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'BUILD EXECUTION STARTED'
-                sh 'make build'
+                sh 'make build TARGETOS=${params.OS} TARGETARCH=${params.ARCH}'
             }
         }
-
         stage('image') {
             steps {
                 echo 'BUILD IMAGE EXECUTION STARTED'
