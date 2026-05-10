@@ -54,15 +54,16 @@ pipeline {
         }
         stage('Test') {
             steps {
-                if (params.SKIP_TESTS) {
-                    echo 'Skipping tests'
-                } else {
-                    echo 'TEST EXECUTION STARTED'
-                    sh 'make test'
+                script {
+                    if (params.SKIP_TESTS) {
+                        echo 'Skipping tests'
+                    } else {
+                        echo 'TEST EXECUTION STARTED'
+                        sh 'make test'
+                    }
                 }
             }
         }
-
         stage('Build') {
             steps {
                 echo 'BUILD EXECUTION STARTED'
