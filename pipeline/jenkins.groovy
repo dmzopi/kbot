@@ -1,9 +1,9 @@
 pipeline {
         agent {
-            // Golang must be installed on agent host, label applied.
+        // Golang must be installed on agent host, label applied.
         label 'go'
-    }
-    
+        }
+
     parameters {
         choice(
             name: 'OS',
@@ -28,7 +28,7 @@ pipeline {
     }
 
     stages {
-        /* 
+        /*
         // Step is skipped since project uses Pipeline script from SCM, so repo clone is done automatically.
         stage('Clone') {
             steps {
@@ -39,41 +39,45 @@ pipeline {
         */
         stage('PrintEnv') {
             steps {
-                echo 'Cloned repo: ${REPO}, branch: ${BRANCH}'
-                echo 'Building with parameters: \n OS=$OS \n ARCH=$ARCH \n SKIP_TESTS=$SKIP_TESTS \n SKIP_LINT=$SKIP_LINT'
+                echo 'Cloned repo: $GIT_URL, branch: $GIT_BRANCH'
+                echo 'Building with parameters: '
+                echo 'OS=${params.OS}\nARCH=${params.ARCH}\nSKIP_TESTS=${params.SKIP_TESTS}\nSKIP_LINT=${params.SKIP_LINT}'
+
             }
         }
         stage('Test') {
             steps {
-                echo 'TEST EXECUTIN STARTED'
-                sh 'make test'
-        }
+                if (params.SKIP_TESTS) {
+                    echo 'Skipping tests'
+                } else {
+                    echo 'TEST EXECUTION STARTED'
+                    sh 'make test'
+                }
+            }
         }
 
         stage('Build') {
             steps {
                 echo 'BUILD EXECUTION STARTED'
                 sh 'make build'
-        }
+            }
         }
 
         stage('image') {
             steps {
                 echo 'BUILD IMAGE EXECUTION STARTED'
                 sh 'make image'
+            }
         }
-    }
         stage('push') {
             // Require Docker Pipeline plugin. Use docker.io log/pass from Credentials.
             steps {
                 script {
-                    docker.withRegistry( '', 'docker_hub_repo') {
+                    docker.withRegistry('', 'docker_hub_repo') {
                         sh 'make push'
                     }
                 }
-
+            }
         }
     }
-
-}
 }
