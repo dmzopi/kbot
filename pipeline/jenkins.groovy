@@ -23,15 +23,16 @@ pipeline {
             description: 'Skip running linter'
         )
     }
-/* 
+
     stages {
+        /* 
         stage('Clone') {
             steps {
                 echo 'CLONE REPOSITORY'
                 git branch: "${BRANCH}", url: "${REPO}"
             }
         }
-*/ 
+        */ 
         stage('Test') {
             steps {
                 echo 'TEST EXECUTIO STARTED'
