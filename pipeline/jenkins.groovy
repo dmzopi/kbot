@@ -39,10 +39,17 @@ pipeline {
         */
         stage('PrintEnv') {
             steps {
-                echo 'Cloned repo: $GIT_URL, branch: $GIT_BRANCH'
-                echo 'Building with parameters: '
-                echo 'OS=${params.OS}\nARCH=${params.ARCH}\nSKIP_TESTS=${params.SKIP_TESTS}\nSKIP_LINT=${params.SKIP_LINT}'
+                script {
+                    echo "Cloned repo: ${env.GIT_URL}, branch: ${env.GIT_BRANCH}"
 
+                    echo """
+                        Parameters:
+                        OS          = ${params.OS}
+                        ARCH        = ${params.ARCH}
+                        SKIP_TESTS  = ${params.SKIP_TESTS}
+                        SKIP_LINT   = ${params.SKIP_LINT}
+                        """
+                }
             }
         }
         stage('Test') {
