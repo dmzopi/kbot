@@ -59,7 +59,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                echo 'BUILD EXECUTION STARTED'
+                echo 'BUILD BINARY EXECUTION STARTED'
                 sh "make build TARGETOS=${params.OS} TARGETARCH=${params.ARCH}"
             }
         }
