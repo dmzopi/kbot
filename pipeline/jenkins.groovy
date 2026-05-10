@@ -1,5 +1,6 @@
 pipeline {
         agent {
+            // Golang must be installed on agent host, label applied.
         label 'go'
     }
     
@@ -28,16 +29,22 @@ pipeline {
 
     stages {
         /* 
+        // Step is skipped since project uses Pipeline script from SCM, so repo clone is done automatically.
         stage('Clone') {
             steps {
                 echo 'CLONE REPOSITORY'
                 git branch: "${BRANCH}", url: "${REPO}"
             }
         }
-        */ 
+        */
+        stage('PrintEnv') {
+            steps {
+                echo 'Cloned repo: ${REPO}, branch: ${BRANCH}'
+            }
+        }
         stage('Test') {
             steps {
-                echo 'TEST EXECUTIO STARTED'
+                echo 'TEST EXECUTIN STARTED'
                 sh 'make test'
         }
         }
@@ -56,6 +63,7 @@ pipeline {
         }
     }
         stage('push') {
+            // Require Docker Pipeline plugin. Use docker.io log/pass from Credentials.
             steps {
                 script {
                     docker.withRegistry( '', 'docker_hub_repo') {
