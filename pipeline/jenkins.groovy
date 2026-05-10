@@ -66,7 +66,7 @@ pipeline {
         stage('image') {
             steps {
                 echo 'BUILD IMAGE EXECUTION STARTED'
-                sh 'make image TARGETOS=${params.OS} TARGETARCH=${params.ARCH}'
+                sh "make image TARGETOS=${params.OS} TARGETARCH=${params.ARCH}"
             }
         }
         stage('push') {
