@@ -1,0 +1,72 @@
+# Pipeline is valid for gitlab-runnner type "shell".
+stages:
+  - printenv
+  - test
+  - build
+  - buildimage
+  - push
+  - cleanup
+
+# Default variables. Can be overrided manually by setting project CI/CD variables.
+variables:
+  OS: "linux"
+  ARCH: "amd64"
+  SKIP_TESTS: "false"
+
+default:
+  tags:
+    - go
+
+printenv:
+  stage: printenv
+  script:
+    - |
+      echo "Cloned repo: $CI_REPOSITORY_URL, branch: $CI_COMMIT_REF_NAME"
+      echo "building with parameters:"
+      echo "OS         = $OS"
+      echo "ARCH       = $ARCH"
+      echo "SKIP_TESTS = $SKIP_TESTS"
+
+test:
+  stage: test
+  script:
+    - |
+      if [ "$SKIP_TESTS" = "true" ]; then
+        echo "TEST SKIPPED"
+      else
+        echo "TEST EXECUTION STARTED"
+        make test
+      fi
+
+build:
+  stage: build
+  script:
+    - echo "BUILD BINARY EXECUTION STARTED"
+    - make build TARGETOS=$OS TARGETARCH=$ARCH
+
+buildimage:
+  stage: buildimage
+  script:
+    - echo "BUILD IMAGE EXECUTION STARTED"
+    - make image TARGETOS=$OS TARGETARCH=$ARCH
+
+push:
+  stage: push
+  
+  ## For "docker" type runners image/service must be set. 
+  #image: docker:latest
+  #services:
+  #  - docker:dind
+
+  # Docker credentials must be set in project CI/CD variables
+  before_script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  script:
+    - echo "PUSH IMAGE EXECUTION STARTED"
+    - make push TARGETOS=$OS TARGETARCH=$ARCH
+
+cleanup:
+  stage: cleanup
+  script:
+    - echo "CLEANING"
+    - make clean RMI=true

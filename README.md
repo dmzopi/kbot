@@ -1,6 +1,6 @@
 # kbot
 
-A Telegram bot for Golang learning purposes 
+A Telegram bot for Golang learning purposes
 
 ## Features
 
