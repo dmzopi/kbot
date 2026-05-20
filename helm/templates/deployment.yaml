@@ -21,7 +21,7 @@ spec:
         {{- end }}
     spec:
       dnsConfig:
-        nameServers:
+        nameservers:
           - 1.1.1.1
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
