@@ -1,10 +1,12 @@
+# github actions pipeline
+
 name: KBOT-CICD
 
 # Allow github actions to commit code
 permissions:
   contents: write
 
-# Event that triggers job 
+# Event that triggers this job 
 on:
   pull_request:
     branches:
@@ -13,17 +15,17 @@ on:
 jobs:
   ci:
     name: CI
-    #Runner with run on githib vm, ubuntu 
+    #Run on github hosted ubuntu 
     runs-on: ubuntu-latest
     #Run on self-hosted runner
     #runs-on: self-hosted
 
     steps:
-      # Fetch the repo code to runner
+      # Fetch the repo code from runner
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # we need all history for bracnhes and tags, beacuse we use it for versioning in Makefile
+          fetch-depth: 0 # we need all history for bracnhes and tags because we use it for versioning in Makefile
       - name: Run test
         run: make test
       
@@ -41,7 +43,7 @@ jobs:
     
   cd:
     name: CD
-    needs: ci #starts only is ci job finished well
+    needs: ci #starts only if ci job finished well
     runs-on: ubuntu-latest
 
     steps:
