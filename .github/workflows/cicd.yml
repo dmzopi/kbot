@@ -39,7 +39,7 @@ jobs:
         env:
           APP: "kbot"
           REGISTRY: ${{ secrets.DOCKERHUB_USERNAME }}
-        run: make image push
+        run: make print-env image push
     
   cd:
     name: CD
@@ -66,7 +66,7 @@ jobs:
         git commit -am "chore: update version to $VERSION"
         git push
     
-    - name: Checkout kbot repo
+    - name: Checkout FluxCD repo
       uses: actions/checkout@v4
     - name: Clone Flux repo
       run: |
