@@ -38,7 +38,7 @@ jobs:
       - name: Build&Push
         env:
           APP: "kbot"
-          REGISTRY: ${{ secrets.DOCKERHUB_USERNAME }}
+          REGISTRY: "docker.io"
         run: make print-env image push
     
   cd:
