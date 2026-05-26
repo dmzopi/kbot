@@ -75,13 +75,13 @@ jobs:
 
     - name: Generate Kubernetes Secret
       run: |
-        mkdir -p fluxcd-eks/clusters/k8s-flux-eks/
+        mkdir -p fluxcd-eks/clusters/k8s-flux-eks/kbot
 
-        cat <<EOF > fluxcd-eks/clusters/k8s-flux-eks/kbot-secret.yaml
+        cat <<EOF > fluxcd-eks/clusters/k8s-flux-eks/kbot/kbot-secret.yaml
         apiVersion: v1
         kind: Secret
         metadata:
-          name: kbot-secret
+          name: kbot
           namespace: demo
         type: Opaque
         stringData:
@@ -107,7 +107,7 @@ jobs:
         
     - name: Encrypt secret with SOPS
       run: |
-        sops -e --kms "${{ secrets.KMS_KEY }}" --encrypted-regex '^(token)$' fluxcd-eks/clusters/k8s-flux-eks/kbot-secret.yaml > fluxcd-eks/clusters/k8s-flux-eks/kbot-secret-cyph.yaml
+        sops -e --kms "${{ secrets.KMS_KEY }}" --encrypted-regex '^(token)$' fluxcd-eks/clusters/k8s-flux-eks/kbot/kbot-secret.yaml > fluxcd-eks/clusters/k8s-flux-eks/kbot/kbot-secret-cyph.yaml
 
     - name: Commit to Flux repo
       run: |
@@ -116,7 +116,7 @@ jobs:
         git config user.name github-actions
         git config user.email github-actions@github.com
 
-        git add clusters/k8s-flux-eks/kbot-secret-cyph.yaml
+        git add fluxcd-eks/clusters/k8s-flux-eks/kbot/kbot-secret-cyph.yaml
 
         git commit -m "chore: add encrypted kbot secret" || echo "no changes"
         git push
