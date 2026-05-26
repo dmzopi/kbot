@@ -2,6 +2,9 @@ resource "github_repository" "this" {
   name       = var.repository_name
   visibility = var.repository_visibility
   auto_init  = true
+  lifecycle {
+  ignore_changes = all
+}
 }
 
 resource "github_repository_deploy_key" "this" {

@@ -65,4 +65,45 @@ jobs:
         git config user.email github-actions@github.com
         git commit -am "chore: update version to $VERSION"
         git push
+    
+    - name: Checkout kbot repo
+      uses: actions/checkout@v4
+    - name: Clone Flux repo
+      run: |
+        git clone https://x-access-token:${{ secrets.FLUX_REPO_TOKEN }}@github.com/dmzopi/fluxcd-eks.git flux-repo
+    
+    - name: Generate Kubernetes secret
+      run: |
+        cat <<EOF > fluxcd-eks/clusters/k8s-flux-eks/kbot-secret.yaml
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: kbot-secret
+          namespace: demo
+        type: Opaque
+        stringData:
+          token: "${{ secrets.TELE_TOKEN }}"
+        EOF
+    - name: Install SOPS
+      run: |
+        curl -LO https://github.com/getsops/sops/releases/latest/download/sops-v3.9.4.linux.amd64
+        sudo mv sops-v3.9.4.linux.amd64 /usr/local/bin/sops
+        sudo chmod +x /usr/local/bin/sops
 
+    - name: Encrypt secret with SOPS
+      run: |
+        # sops -e --kms "${{ secrets.KMS_KEY }}" --encrypted-regex '^(token)$' fluxcd-eks/clusters/k8s-flux-eks/kbot-secret.yaml > fluxcd-eks/clusters/k8s-flux-eks/kbot-secret-cyph.yaml
+
+    - name: Commit to Flux repo
+      run: |
+        cd fluxcd-eks
+
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+
+        git add clusters/k8s-flux-eks/kbot/kbot-secret-enc.yaml
+
+        git commit -m "add kbot secret cyphered" || echo "no changes"
+        git push
+
+      

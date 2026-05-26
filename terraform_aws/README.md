@@ -4,6 +4,8 @@ This project uses Terraform to
 - create a Kubernetes cluster
 - set up a Github repository to store Kubernetes manifests
 - bootstrap the cluster using FluxCD
+- Create AWS KMS key 
+- 
 
 ## Pre-requisites
 
