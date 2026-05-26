@@ -10,7 +10,7 @@ variable "github_token" {
 
 variable "repository_name" {
   type        = string
-  default     = "flux-gitops"
+  default     = "fluxcd-eks"
   description = "GitHub repository"
 }
 

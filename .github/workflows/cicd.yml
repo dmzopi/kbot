@@ -8,9 +8,12 @@ permissions:
 
 # Event that triggers this job 
 on:
-  pull_request:
+  push:
     branches:
       - main
+  #pull_request:
+  #  branches:
+  #    - main
 
 jobs:
   ci:
@@ -38,8 +41,8 @@ jobs:
       - name: Build&Push
         env:
           APP: "kbot"
-          REGISTRY: ${{ secrets.DOCKERHUB_USERNAME }}
-        run: make image push
+          REGISTRY: "docker.io"
+        run: make print-env image push
     
   cd:
     name: CD
@@ -53,7 +56,7 @@ jobs:
         fetch-depth: 0
     # Pass VERSION to HITHUBENV, so shared with other steps
     - run: echo "VERSION=$(git describe --tags --abbrev=0)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-    # Set current image TAG in helm chart 
+    # Set current image TAG in helm chart.
     - name: Update Helm chart
       uses: mikefarah/yq@master
       with:
@@ -65,4 +68,57 @@ jobs:
         git config user.email github-actions@github.com
         git commit -am "chore: update version to $VERSION"
         git push
+    
+    - name: Clone Flux repo
+      run: |
+        git clone https://x-access-token:${{ secrets.TARGET_REPO_TOKEN }}@github.com/dmzopi/fluxcd-eks.git fluxcd-eks
 
+    - name: Generate Kubernetes Secret
+      run: |
+        mkdir -p fluxcd-eks/clusters/k8s-flux-eks/
+
+        cat <<EOF > fluxcd-eks/clusters/k8s-flux-eks/kbot-secret.yaml
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: kbot-secret
+          namespace: demo
+        type: Opaque
+        stringData:
+          token: "${{ secrets.TELE_TOKEN }}"
+        EOF
+
+    - name: Install SOPS
+      run: |
+
+        curl -LO https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.linux.amd64
+
+        chmod +x sops-v3.13.1.linux.amd64
+        sudo mv sops-v3.13.1.linux.amd64 /usr/local/bin/sops
+
+        sops --version
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-central-1
+        
+    - name: Encrypt secret with SOPS
+      run: |
+        sops -e --kms "${{ secrets.KMS_KEY }}" --encrypted-regex '^(token)$' fluxcd-eks/clusters/k8s-flux-eks/kbot-secret.yaml > fluxcd-eks/clusters/k8s-flux-eks/kbot-secret-cyph.yaml
+
+    - name: Commit to Flux repo
+      run: |
+        cd fluxcd-eks
+
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+
+        git add clusters/k8s-flux-eks/kbot-secret-cyph.yaml
+
+        git commit -m "chore: add encrypted kbot secret" || echo "no changes"
+        git push
+
+      

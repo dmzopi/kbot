@@ -4,7 +4,7 @@ variable "aws_region" {
 }
 variable "cluster_name" {
   type    = string
-  default = "k8s-flux"
+  default = "k8s-flux-eks"
 }
 variable "worker_nodes_min" {
   type    = string
