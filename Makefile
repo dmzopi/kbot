@@ -9,7 +9,7 @@ TARGETOS=linux
 TARGETARCH=amd64
 
 # Assign target image
-ifeq ($(filter $(strip $(REGISTRY)), docker.io),docker.io)
+ifeq ($(REGISTRY),docker.io)
 TARGETIMAGE := $(REPO)/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
 else ifeq ($(strip $(REGISTRY)),)
 TARGETIMAGE := $(REPO)/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
