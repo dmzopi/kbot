@@ -103,7 +103,7 @@ jobs:
 
         git add clusters/k8s-flux-eks/kbot/kbot-secret-enc.yaml
 
-        git commit -m "add kbot secret cyphered" || echo "no changes"
+        git commit -m "add kbot secret (cyphered)" || echo "no changes"
         git push
 
       
