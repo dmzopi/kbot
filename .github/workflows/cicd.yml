@@ -46,7 +46,7 @@ jobs:
     
   cd:
     name: CD
-    #needs: ci #starts only if ci job finished well
+    needs: ci #starts only if ci job finished well
     runs-on: ubuntu-latest
 
     steps:

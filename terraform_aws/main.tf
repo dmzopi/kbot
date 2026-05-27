@@ -127,10 +127,14 @@ module "irsa_flux_kustomize" {
   }
 }
 
-# Annotate Flux Service Account: connects your k8s workload to an AWS identity in AWS IAM via IRSA. 
-provider "kubernetes" {
-  config_path = module.k8s.kubeconfig_path
-}
+/*
+# Imperative way: Annotate Flux Service Account, so to connect k8s workload to an AWS identity in AWS IAM via IRSA.
+# Annotation survives Flux reconiles normally, until flux reinstall, gotk-componets reapplied.action 
+# Recomended Declarative way: fetch output "iam_policy_flux_arn", put ./manifests/flux-system to fluxcd repo on github
+
+#provider "kubernetes" {
+#  config_path = module.k8s.kubeconfig_path
+#}
 
 resource "kubernetes_annotations" "flux_sa_patch" {
   api_version = "v1"
@@ -146,10 +150,12 @@ resource "kubernetes_annotations" "flux_sa_patch" {
     module.fluxcd, module.k8s
   ]
 }
+*/
+
 /*
 # 
-# Patch controler to support decryption (skip). 
-# Put manifests from ./manifests/flux-system to github
+# Imperative way: patch controler to support decryption
+# Put manifests from ./manifests/flux-system to fluxcd repo on github
 resource "null_resource" "patch_flux" {
   provisioner "local-exec" {
     command = <<EOT

@@ -10,3 +10,6 @@ output "kubectl_use" {
 output "kms_key_arn" {
   value = resource.aws_kms_key.flux_sops.arn
   }
+output "iam_policy_flux_arn" {
+ value = aws_iam_policy.flux_kms.arn
+}
