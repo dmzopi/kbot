@@ -10,3 +10,8 @@ output "kubectl_use" {
 output "kms_key_arn" {
   value = resource.aws_kms_key.flux_sops.arn
   }
+output "flux_sa_annotation" {
+  value = {
+    "eks.amazonaws.com/role-arn" = module.irsa_flux_kustomize.arn
+  }
+}

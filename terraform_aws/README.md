@@ -96,6 +96,21 @@ NAMESPACE   NAME   AGE     READY     STATUS
 demo        kbot   5m55s   Unknown   Running 'upgrade' action with timeout of 5m0s
 ```
 
+## AWS KMS integration for k8s secrets cypher/decypher
+#### Apply patches from terraform_aws/manifests/flux-system
+- irsa-patch.yaml: allows k8s workload to get access to KMS as AWS IAM via IRSA.
+- sops-patch.yaml: allows flux to decypher secrets cyphered by sops
+#### Verify patches
+```
+k get sa -n flux-system kustomize-controller -o yaml | grep -A5 anno
+k -n flux-system get kustomizations.kustomize.toolkit.fluxcd.io flux-system -o yaml
+```
+#### Secret itself is prepared and pushed to clusters/k8s-flux-eks/kbot/ by gh pipeline, flux reconciles
+```
+k -n demo get secrets kbot -o yaml
+```
+
+
 ## General CI/CD layout
 
 ![Flow](docs/img/flow.png)

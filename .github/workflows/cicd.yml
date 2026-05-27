@@ -25,7 +25,7 @@ jobs:
 
     steps:
       # Fetch the repo code from runner
-      - name: Checkout
+      - name: Checkout.
         uses: actions/checkout@v3
         with:
           fetch-depth: 0 # we need all history for bracnhes and tags because we use it for versioning in Makefile
@@ -72,23 +72,52 @@ jobs:
     - name: Clone Flux repo
       run: |
         git clone https://x-access-token:${{ secrets.TARGET_REPO_TOKEN }}@github.com/dmzopi/fluxcd-eks.git fluxcd-eks
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-central-1
 
+    # Use TELE_TOKEN stored in github secrets 
+    #- name: Generate Kubernetes Secret
+    #  run: |
+    #    mkdir -p fluxcd-eks/clusters/k8s-flux-eks/kbot
+    #    cat <<EOF > fluxcd-eks/clusters/k8s-flux-eks/kbot/kbot-secret.yaml
+    #    apiVersion: v1
+    #    kind: Secret
+    #    metadata:
+    #      name: kbot
+    #      namespace: demo
+    #    type: Opaque
+    #    stringData:
+    #      token: "${{ secrets.TELE_TOKEN }}"
+    #    EOF
+    
+    # Or Fetch TELE_TOKEN stored in github secrets
+    - name: Load secrets
+      uses: aws-actions/aws-secretsmanager-get-secrets@v1
+      with:
+        secret-ids: |
+          TELE_TOKEN_S,kbot/tele_token
+    
     - name: Generate Kubernetes Secret
       run: |
         mkdir -p fluxcd-eks/clusters/k8s-flux-eks/kbot
-
-        cat <<EOF > fluxcd-eks/clusters/k8s-flux-eks/kbot/kbot-secret.yaml
+        TOKEN=$(echo "$TELE_TOKEN_S" | jq -r '.TELE_TOKEN')
+        TOKEN_B64=$(echo -n "$TOKEN" | base64 -w 0)
+        cat > fluxcd-eks/clusters/k8s-flux-eks/kbot/kbot-secret.yaml << EOF
         apiVersion: v1
         kind: Secret
         metadata:
           name: kbot
           namespace: demo
-        type: Opaque
-        stringData:
-          token: "${{ secrets.TELE_TOKEN }}"
+        data:
+          token: $TOKEN_B64
         EOF
 
-    - name: Install SOPS
+    - name: Install SOPS.
       run: |
 
         curl -LO https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.linux.amd64
@@ -98,13 +127,6 @@ jobs:
 
         sops --version
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: eu-central-1
-        
     - name: Encrypt secret with SOPS
       run: |
         sops -e --kms "${{ secrets.KMS_KEY }}" --encrypted-regex '^(token)$' fluxcd-eks/clusters/k8s-flux-eks/kbot/kbot-secret.yaml > fluxcd-eks/clusters/k8s-flux-eks/kbot/kbot-secret-cyph.yaml

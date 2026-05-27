@@ -7,3 +7,7 @@ patches:
   - path: sops-patch.yaml
     target:
       kind: Kustomization
+  - path: irsa-patch.yaml
+    target:
+      kind: ServiceAccount
+      name: kustomize-controller
