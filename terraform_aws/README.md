@@ -46,7 +46,7 @@ kubectl -n flux-system get all
 
 `Git repo (github) → GitRepository (source) → Kustomization (reconciler) → HelmRelease → Helm controller -> Kubernetes API -> Deployment/Pods`
 
-GitRepository (kind: GitRepository): clones Git repo, pulls changes every interval, produces an “artifact”
+GitRepository (kind: GitRepository): clones Git repo, pulls changes every interval, produces an “artifact”.
 
 Kustomization (kind: Kustomization): points to a path in Git repo, runs kustomize build, applies manifests to cluster, handles pruning (delete removed resources). Applies ./clusters/$CLUSTER_NAME from repo.
 
