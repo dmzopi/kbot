@@ -1,0 +1,20 @@
+stream_over_http_enabled: true
+server:
+  http_listen_port: 3200
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+        http:
+        
+storage:
+  trace:
+    backend: local
+    block:
+      version: v2
+    local:
+      path: /var/tempo/blocks
+    wal:
+      path: /var/tempo/wal

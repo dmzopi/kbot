@@ -3,7 +3,7 @@ REGISTRY ?= docker.io
 REPO ?= opidoc
 VERSION=$(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
 RMI ?= false
-#TARGETOS options: inux windows darwin
+#TARGETOS options: linux windows darwin
 TARGETOS=linux
 #TARGETARCH options: amd64 arm64
 TARGETARCH=amd64

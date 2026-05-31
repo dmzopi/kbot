@@ -1,0 +1,52 @@
+
+
+1.  Loki
+
+kubectl create namespace monitoring
+
+helm repo add grafana-community https://grafana-community.github.io/helm-charts
+helm repo update
+
+helm install loki grafana-community/loki -f values.yaml
+
+In grafana UI: 
+https://grafana.ubuntu-vm.home/connections/datasources
+add datasource
+Type: Loki
+Url: http://loki-gateway.default.svc.cluster.local/
+HTTP headers:
+X-Scope-OrgID : foo
+
+2. Prometheus
+
+helm install prometheus prometheus-community/prometheus -n monitoring
+In grafana UI: 
+Prometheus server URL: http://prometheus-server.monitoring.svc.cluster.local
+
+3. Grafana 
+
+helm repo add grafana-community https://grafana-community.github.io/helm-charts
+
+helm install grafana grafana-community/grafana --namespace monitoring
+
+wget https://raw.githubusercontent.com/grafana-community/helm-charts/refs/heads/main/charts/grafana/values.yaml
+
+persistence:
+  type: pvc
+  enabled: true
+
+helm upgrade grafana grafana-community/grafana -f values.yaml -n monitoring
+
+k apply -f grafana-ingress.yaml
+
+kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+4. OTEL operator
+
+PREREQ:
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.20.2/cert-manager.yaml
+
+kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
+
+5. Fluentbit
+helm repo add fluent https://fluent.github.io/helm-charts

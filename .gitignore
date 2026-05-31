@@ -71,3 +71,6 @@ todo.txt
 ###
 terraform_aws/kubeconfig/*
 terraform_kind/kubeconfig/*
+
+##
+otel_dev/tempo/data/

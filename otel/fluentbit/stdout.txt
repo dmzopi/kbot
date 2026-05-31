@@ -1,0 +1,14 @@
+helm install fluent-bit fluent/fluent-bit \
+>   -n monitoring --create-namespace \
+>   -f values.yaml
+NAME: fluent-bit
+LAST DEPLOYED: Tue Jun  2 17:26:58 2026
+NAMESPACE: monitoring
+STATUS: deployed
+REVISION: 1
+NOTES:
+Get Fluent Bit build information by running these commands:
+
+export POD_NAME=$(kubectl get pods --namespace monitoring -l "app.kubernetes.io/name=fluent-bit,app.kubernetes.io/instance=fluent-bit" -o jsonpath="{.items[0].metadata.name}")
+kubectl --namespace monitoring port-forward $POD_NAME 2020:2020
+curl http://127.0.0.1:2020
