@@ -204,59 +204,59 @@ to quickly create a Cobra application.`,
 
 // Log Wrapper
 func withLogging(next telebot.HandlerFunc) telebot.HandlerFunc {
-  return func(c telebot.Context) error {
+	return func(c telebot.Context) error {
 
-    ctxVal := c.Get("ctx")
+		ctxVal := c.Get("ctx")
 
-    ctx, ok := ctxVal.(context.Context)
-    if !ok {
-      ctx = context.Background()
-    }
+		ctx, ok := ctxVal.(context.Context)
+		if !ok {
+			ctx = context.Background()
+		}
 
-    span := trace.SpanFromContext(ctx)
-    traceID := span.SpanContext().TraceID().String()
+		span := trace.SpanFromContext(ctx)
+		traceID := span.SpanContext().TraceID().String()
 
-    if c.Message() != nil && logger != nil {
-      logger.Info().
-        Str("trace_id", traceID).
-        Str("command", c.Message().Text).
-        Int64("chat_id", c.Chat().ID).
-        Msg("command received")
-    }
+		if c.Message() != nil && logger != nil {
+			logger.Info().
+				Str("trace_id", traceID).
+				Str("command", c.Message().Text).
+				Int64("chat_id", c.Chat().ID).
+				Msg("command received")
+		}
 
-    return next(c)
-  }
+		return next(c)
+	}
 }
 
 // Trace Wrapper
 func withTracing(command string, next telebot.HandlerFunc) telebot.HandlerFunc {
-  return func(c telebot.Context) error {
+	return func(c telebot.Context) error {
 
-    ctx, span := tracer.Start(
-      context.Background(),
-      "telegram.command."+command,
-    )
-    defer span.End()
+		ctx, span := tracer.Start(
+			context.Background(),
+			"telegram.command."+command,
+		)
+		defer span.End()
 
-    span.SetAttributes(
-      attribute.String("command", command),
-      attribute.Int64("chat_id", c.Chat().ID),
-    )
+		span.SetAttributes(
+			attribute.String("command", command),
+			attribute.Int64("chat_id", c.Chat().ID),
+		)
 
-    // store ctx explicitly
-    c.Set("ctx", ctx)
+		// store ctx explicitly
+		c.Set("ctx", ctx)
 
-    err := next(c)
+		err := next(c)
 
-    if err != nil {
-      span.RecordError(err)
-      span.SetStatus(codes.Error, err.Error())
-    } else {
-      span.SetStatus(codes.Ok, "ok")
-    }
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		} else {
+			span.SetStatus(codes.Ok, "ok")
+		}
 
-    return err
-  }
+		return err
+	}
 }
 
 func init() {

@@ -10,9 +10,12 @@ image:
   # This sets the pull policy for images.
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1.0.3-33f0ba9"
+  tag: "v1.0.4-d851216-linux"
   arch: "amd64"
 secret:
   secretName: kbot
   secretKey: token
   token: "TELE_TOKEN"
+env:
+  - name: METRICS_HOST
+    value: "otel-collector-collector.monitoring.svc.cluster.local:4317"
