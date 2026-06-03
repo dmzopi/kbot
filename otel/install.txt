@@ -50,3 +50,9 @@ kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releas
 
 5. Fluentbit
 helm repo add fluent https://fluent.github.io/helm-charts
+
+
+helm upgrade fluent-bit fluent/fluent-bit -n monitoring -f values.yaml
+kubectl rollout restart daemonset fluent-bit -n monitoring
+
+6. Tempo

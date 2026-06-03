@@ -62,3 +62,7 @@ bloomBuilder:
   replicas: 0
 bloomGateway:
   replicas: 0
+chunksCache:
+  enabled: false
+resultsCache:
+  enabled: false
