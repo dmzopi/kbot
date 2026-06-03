@@ -27,6 +27,10 @@ spec:
       #  endpoint: http://loki-gateway.default.svc.cluster.local/loki/api/v1/push
       prometheus:
         endpoint: "0.0.0.0:8889"
+      otlp/tempo:
+        endpoint: tempo.monitoring.svc.cluster.local:4317
+        tls:
+          insecure: true
 
     service:
       pipelines:
@@ -37,4 +41,4 @@ spec:
         traces:
           receivers: [otlp]
           processors: [memory_limiter, batch]
-          exporters: [debug]
+          exporters: [otlp/tempo]

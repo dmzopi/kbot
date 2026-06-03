@@ -52,6 +52,21 @@ podSecurityPolicy:
     # This policy assumes the nodes are using AppArmor rather than SELinux.
     rule: RunAsAny
 
+# OpenShift-specific configuration
+openShift:
+  enabled: false
+  securityContextConstraints:
+    # Create SCC for Fluent-bit and allow use it
+    create: true
+    name: ""
+    annotations: {}
+    runAsUser:
+      type: RunAsAny
+    seLinuxContext:
+      type: MustRunAs
+    # Use existing SCC in cluster, rather then create new one
+    existingName: ""
+
 podSecurityContext: {}
 #   fsGroup: 2000
 
@@ -390,6 +405,12 @@ config:
         Mem_Buf_Limit 5MB
         Skip_Long_Lines On
 
+    [INPUT]
+        Name systemd
+        Tag host.*
+        Systemd_Filter _SYSTEMD_UNIT=kubelet.service
+        Read_From_Tail On
+
   ## https://docs.fluentbit.io/manual/pipeline/filters
   filters: |
     [FILTER]
@@ -400,24 +421,22 @@ config:
         K8S-Logging.Parser On
         K8S-Logging.Exclude On
 
-    [FILTER]
-        Name         parser
-        Match        kube.*
-        Key_Name     log
-        Parser       app_json_parser
-        Parser       app_json_parser_no_ms
-        Reserve_Data True
-
   ## https://docs.fluentbit.io/manual/pipeline/outputs
   outputs: |
     [OUTPUT]
-        Name loki
+        Name es
         Match kube.*
-        Host loki-gateway.default.svc.cluster.local
-        Port 80
-        URI /loki/api/v1/push
-        tenant_id foo
-        labels job=fluentbit,namespace=$kubernetes['namespace_name'],pod=$kubernetes['pod_name'],container=$kubernetes['container_name']
+        Host elasticsearch-master
+        Logstash_Format On
+        Retry_Limit False
+
+    [OUTPUT]
+        Name es
+        Match host.*
+        Host elasticsearch-master
+        Logstash_Format On
+        Logstash_Prefix node
+        Retry_Limit False
 
   ## https://docs.fluentbit.io/manual/administration/configuring-fluent-bit/classic-mode/upstream-servers
   ## This configuration is deprecated, please use `extraFiles` instead.
@@ -431,20 +450,6 @@ config:
         Time_Keep Off
         Time_Key time
         Time_Format %Y-%m-%dT%H:%M:%S.%L
-    [PARSER]
-        Name        app_json_parser
-        Format      json
-        Time_Key    time
-        Time_Format %Y-%m-%dT%H:%M:%S.%LZ
-        Time_Keep   On
-
-    [PARSER]
-        Name        app_json_parser_no_ms
-        Format      json
-        Time_Key    time
-        Time_Format %Y-%m-%dT%H:%M:%SZ
-        Time_Keep   On
-        
 
   # This allows adding more files with arbitrary filenames to /fluent-bit/etc/conf by providing key/value pairs.
   # The key becomes the filename, the value becomes the file content.
@@ -478,7 +483,7 @@ daemonSetVolumes:
   - name: etcmachineid
     hostPath:
       path: /etc/machine-id
-      type: FileOrCreate
+      type: File
 
 daemonSetVolumeMounts:
   - name: varlog
