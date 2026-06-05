@@ -44,6 +44,8 @@ This repository provisions a full observability stack on Kubernetes using Flux G
 - Namespace-aware labeling
 - Kubernetes metadata enrichment enabled
 
+---
+
 ### Loki
 - Installed via Helm via Flux
 - Centralized log aggregation
