@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-values
+  namespace: monitoring
+data:
+  values.yaml: |
+    affinity: {}
+    annotations: {}
+
+    args:
+      - --workdir=/fluent-bit/etc
+      - --config=/fluent-bit/etc/conf/fluent-bit.conf
+
+    command:
+      - /fluent-bit/bin/fluent-bit
+
+    kind: DaemonSet
+
+    image:
+      repository: cr.fluentbit.io/fluent/fluent-bit
+      tag: null
+      pullPolicy: IfNotPresent
+
+    flush: 1
+    logLevel: info
+    metricsPort: 2020
+
+    config:
+      customParsers: |
+        [PARSER]
+            Name docker_no_time
+            Format json
+            Time_Keep Off
+            Time_Key time
+            Time_Format %Y-%m-%dT%H:%M:%S.%L
+
+        [PARSER]
+            Name app_json_parser
+            Format json
+            Time_Key time
+            Time_Format %Y-%m-%dT%H:%M:%S.%LZ
+            Time_Keep On
+
+        [PARSER]
+            Name app_json_parser_no_ms
+            Format json
+            Time_Key time
+            Time_Format %Y-%m-%dT%H:%M:%SZ
+            Time_Keep On
+
+      inputs: |
+        [INPUT]
+            Name tail
+            Path /var/log/containers/*.log
+            multiline.parser docker, cri
+            Tag kube.*
+            Mem_Buf_Limit 5MB
+            Skip_Long_Lines On
+
+      filters: |
+        [FILTER]
+            Name kubernetes
+            Match kube.*
+            Merge_Log On
+            Keep_Log Off
+            K8S-Logging.Parser On
+            K8S-Logging.Exclude On
+
+        [FILTER]
+            Name parser
+            Match kube.*
+            Key_Name log
+            Parser app_json_parser
+            Parser app_json_parser_no_ms
+            Reserve_Data True
+
+      outputs: |
+        [OUTPUT]
+            Name loki
+            Match kube.*
+            Host loki-gateway.monitoring.svc.cluster.local
+            Port 80
+            URI /loki/api/v1/push
+            tenant_id foo
+            labels job=fluentbit,namespace=$kubernetes['namespace_name'],pod=$kubernetes['pod_name'],container=$kubernetes['container_name']
+
+    daemonSetVolumes:
+      - hostPath:
+          path: /var/log
+        name: varlog
+
+      - hostPath:
+          path: /var/lib/docker/containers
+        name: varlibdockercontainers
+
+      - hostPath:
+          path: /etc/machine-id
+          type: FileOrCreate
+        name: etcmachineid
+
+    daemonSetVolumeMounts:
+      - mountPath: /var/log
+        name: varlog
+
+      - mountPath: /var/lib/docker/containers
+        name: varlibdockercontainers
+        readOnly: true
+
+      - mountPath: /etc/machine-id
+        name: etcmachineid
+        readOnly: true

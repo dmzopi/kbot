@@ -1,0 +1,9 @@
+NAME       	NAMESPACE  	REVISION	UPDATED                                	STATUS  	CHART                        	APP VERSION
+fluent-bit 	monitoring 	22      	2026-06-03 21:20:17.282484 +0300 EEST  	deployed	fluent-bit-0.57.6            	5.0.6      
+grafana    	monitoring 	4       	2026-06-02 17:18:49.301958 +0300 EEST  	deployed	grafana-10.5.15              	12.3.1     
+kbot       	demo       	1       	2026-06-02 17:30:08.051905536 +0000 UTC	deployed	kbot-0.0.1                   	1.0.4      
+loki       	default    	4       	2026-06-02 21:22:33.184707 +0300 EEST  	deployed	loki-17.1.6                  	3.7.2      
+prometheus 	monitoring 	2       	2026-06-02 17:02:57.422767 +0300 EEST  	deployed	prometheus-29.9.0            	v3.12.0    
+tempo      	monitoring 	1       	2026-06-03 14:47:20.435178 +0300 EEST  	deployed	tempo-1.24.4                 	2.9.0      
+traefik    	kube-system	1       	2026-05-06 15:40:06.992706169 +0000 UTC	deployed	traefik-27.0.201+up27.0.2    	v2.11.10   
+traefik-crd	kube-system	1       	2026-05-06 15:40:05.514219125 +0000 UTC	deployed	traefik-crd-27.0.201+up27.0.2	v2.11.10   

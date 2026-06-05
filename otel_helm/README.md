@@ -1,5 +1,6 @@
 
-
+# Manual Deployment
+# Logs BE
 1.  Loki
 
 kubectl create namespace monitoring
@@ -17,13 +18,39 @@ Url: http://loki-gateway.default.svc.cluster.local/
 HTTP headers:
 X-Scope-OrgID : foo
 
-2. Prometheus
+# Logs parcer -> Logs BE
+2. Fluentbit
+helm repo add fluent https://fluent.github.io/helm-charts
+
+helm upgrade fluent-bit fluent/fluent-bit -n monitoring -f values.yaml
+kubectl rollout restart daemonset fluent-bit -n monitoring
+
+# Metrics BE
+3. Prometheus
 
 helm install prometheus prometheus-community/prometheus -n monitoring
 In grafana UI: 
 Prometheus server URL: http://prometheus-server.monitoring.svc.cluster.local
 
-3. Grafana 
+# Traces BE
+4. Tempo
+helm install tempo grafana/tempo -n monitoring  -f tempo.yaml
+
+
+# Metrics/Traces FE -> Metrics/Traces BE
+5. OTEL operator
+
+PREREQ:
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.20.2/cert-manager.yaml
+
+kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
+
+Apply change
+k apply -f otel-collector.yaml
+
+
+# Logs/Metrics/Traces UI
+6. Grafana 
 
 helm repo add grafana-community https://grafana-community.github.io/helm-charts
 
@@ -41,21 +68,10 @@ k apply -f grafana-ingress.yaml
 
 kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 
-4. OTEL operator
-
-PREREQ:
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.20.2/cert-manager.yaml
-
-kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
-
-# Apply chang
-k apply -f otel-collector.yaml
 
 
-5. Fluentbit
-helm repo add fluent https://fluent.github.io/helm-charts
+####
 
-helm upgrade fluent-bit fluent/fluent-bit -n monitoring -f values.yaml
-kubectl rollout restart daemonset fluent-bit -n monitoring
+Migration to FluxCD
 
-6. Tempo
+helm get values tempo -n monitoring -o yaml > tempo-values-from-cluster.yaml

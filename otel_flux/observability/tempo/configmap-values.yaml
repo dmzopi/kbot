@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tempo-values
+  namespace: monitoring
+data:
+  values.yaml: |
+    multitenancyEnabled: false
+
+    tempo:
+      repository: grafana/tempo
+      tag: 2.9.0
+
+    tempoConfig:
+      auth_enabled: false
+
+      compactor:
+        compaction:
+          block_retention: 1h
+
+      distributor:
+        receivers:
+          otlp:
+            protocols:
+              grpc: {}
+              http: {}
+
+      ingester:
+        max_block_duration: 5m
+        trace_idle_period: 10s
+
+      server:
+        http_listen_port: 3200
+
+      storage:
+        trace:
+          backend: local
+          local:
+            path: /var/tempo/traces
