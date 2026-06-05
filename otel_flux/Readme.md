@@ -38,6 +38,12 @@ This repository provisions a full observability stack on Kubernetes using Flux G
 
 ---
 
+### Fluent Bit
+- Collects container logs from Kubernetes nodes
+- Forwards logs to Loki via Loki gateway
+- Namespace-aware labeling
+- Kubernetes metadata enrichment enabled
+
 ### Loki
 - Installed via Helm via Flux
 - Centralized log aggregation
