@@ -100,3 +100,7 @@ This repository provisions a full observability stack on Kubernetes using Flux G
 - Tempo trace search works independently via trace ID lookup
 
 ---
+
+## Demo
+
+![Image](otel_flux.gif)
